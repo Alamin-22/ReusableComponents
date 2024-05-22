@@ -20,7 +20,7 @@
                     <p className='text-lg md:text-xl xl:text-3xl font-semibold text-red-500'>$50</p>
                     <del className='text-xs md:text-sm xl:text-xl font-semibold text-gray-600'>$40</del>
                 </div>
-                <div className='flex gap-1'>
+                <div className='flex gap-1 '>
                     <div className='flex items-center gap-1'>
                         <FaStar className='text-sm text-orange-400' />
                         <span className=' font-semibold text-gray-600'>4.8</span>
