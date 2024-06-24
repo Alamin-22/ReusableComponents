@@ -43,7 +43,7 @@ const AddMainCategory = () => {
     const isSelected = (categoryId) => selectedIds.indexOf(categoryId) !== -1;
 
 
-
+    // 
     const handleDeleteCategory = async (category) => {
         const result = await Swal.fire({
             title: "Are you sure?",
