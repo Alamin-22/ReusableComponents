@@ -1,0 +1,12 @@
+imageGallery.jsx is  a reuseable image component that is used as img zoom in out and other feature
+we have to just simply import this component and pass necessary values.
+
+but we have to crate modal first
+
+we have to write this class in the root css file of our project
+/* This is for preventing Default scrollbar when the imageGallery is loaded */
+.prevent-scroll {
+  overflow: hidden; /* Completely prevent scrolling */
+  touch-action: none; /* Prevent touch gestures like scrolling and zooming */
+}
+/* This is for preventing Default scrollbar when the imageGallery is loaded  End*/
