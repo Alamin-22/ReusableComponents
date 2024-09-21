@@ -1,0 +1,10 @@
+  "eslint": "^8",
+  "eslint-config-next": "14.2.13",
+  "eslint-plugin-react": "^7.33.2",
+  "eslint-plugin-react-hooks": "^4.6.0",
+  "eslint-plugin-react-refresh": "^0.4.3",
+
+
+  we have to make use these on our config file on devDependencies
+
+  also we have to update those as needed
