@@ -18,7 +18,7 @@
   },
   "settings": {
      "react": {
-        "version": "18.2"
+        "version": "18.2" /// have to update as required
      }
   },
   "plugins": ["react-refresh"],
