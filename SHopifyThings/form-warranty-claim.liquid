@@ -1,0 +1,1060 @@
+<style>
+  .form-step{
+  padding: 20px;
+  }
+
+  /* Basic styling for the warranty form */
+  .warranty-form {
+    max-width: 800px;
+    margin: 0 auto;
+    margin-bottom: 40px;
+  }
+  .warranty-form .field {
+    margin-bottom: 20px;
+  }
+  .warranty-form label {
+    display: block;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    font-weight: normal;
+  }
+  .warranty-form label.required:after {
+    content: ' *';
+    color: red;
+    margin-left: 5px;
+  }
+  .warranty-form input,
+  .warranty-form textarea,
+  .warranty-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+  }
+  .warranty-form input[type='checkbox'] {
+    width: auto !important;
+  }
+
+  .warranty-form .error {
+    color: red;
+    margin-top: 5px;
+    font-size: 0.9em;
+  }
+
+  .warranty-form button[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .field-title {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .radio-group {
+    display: flex;
+    /* Force a single row (no wrapping) */
+    flex-wrap: nowrap;
+    /* Adjust gap as desired */
+    gap: 2rem;
+  }
+
+  /* Each label stays on a single line */
+  .radio-group label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+
+    font-weight: normal;
+    /* Prevent multi-word text from breaking to new line */
+    white-space: nowrap;
+  }
+
+  .radio-group input[type='radio'] {
+    margin-right: 1rem;
+    width: auto;
+  }
+
+  /* The text input for "Other" */
+  .other-radio-input {
+    margin-left: 0.5rem;
+    padding: 0.4rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 120px; /* Adjust as needed */
+  }
+
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columns */
+    gap: 1rem 2rem; /* row gap, column gap */
+    justify-content: start;
+    margin-bottom: 2rem;
+  }
+
+  /* Each checkbox label is inline with the checkbox */
+
+  .checkbox-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal;
+  }
+
+  .checkbox-group input[type='checkbox'] {
+    margin-right: 1rem;
+    cursor: pointer;
+  }
+
+  .flex-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  {% comment %} responsiveness related code {% endcomment %}
+  @media (max-width: 640px) {
+    /* Tailwind's sm breakpoint (640px) */
+    .flex-container {
+      display: block;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+    .radio-group {
+      display: flex;
+      /* Force a single row (no wrapping) */
+      flex-wrap: nowrap;
+      /* Adjust gap as desired */
+      gap: 0.5rem;
+      flex-direction: column;
+    }
+    .checkbox-group {
+      display: block;
+      margin-bottom: 2rem;
+    }
+  }
+</style>
+
+{% form 'contact', id: 'warranty-claim-form' %}
+  <div class="warranty-form" id="multi-step-form">
+    {%- if form.posted_successfully? -%}
+      <div
+        class="alert mt-8 bg-success-bg text-success-text"
+        tabindex="-1"
+        autofocus
+        {% if settings.animations_enabled != 'disabled' %}
+          data-cc-animate
+        {% endif %}
+      >
+        {{ 'contact.form.post_success' | t }}
+      </div>
+    {%- elsif form.errors -%}
+      <div
+        class="alert mt-8 bg-error-bg text-error-text"
+        tabindex="-1"
+        autofocus
+        {% if settings.animations_enabled != 'disabled' %}
+          data-cc-animate
+        {% endif %}
+      >
+        <h2 class="h5 text-current">{{ 'contact.form.error_heading' | t }}</h2>
+        <ul class="styled-list">
+          <li>
+            <a class="link text-current" href="#{{ form_id }}-email">
+              {{ form.errors.translated_fields.email | capitalize }}
+              {{ form.errors.messages.email }}
+            </a>
+          </li>
+        </ul>
+      </div>
+    {%- endif -%}
+
+    <!-- STEP 1: GENERAL INFORMATION -->
+    <div class="form-step">
+      <h2 style="text-align:center;">Warranty Claim Form</h2>
+
+      <div class="flex-container">
+        <!-- Name -->
+        <div class="field w-full">
+          <label for="claim-name" class="required">Name</label>
+          <input
+            type="text"
+            id="claim-name"
+            name="contact[name]"
+            placeholder="Who is the contact person for this warranty claim?"
+            value="{{ form.name }}"
+            required
+          >
+          {% if form.errors.name %}
+            <div class="error">{{ form.errors.name }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Product Model Number -->
+        <div class="field w-full">
+          <label for="claim-model-number" class="required">Product Model Number</label>
+          <input
+            type="text"
+            id="claim-model-number"
+            name="contact[model_number]"
+            placeholder=""
+            required
+          >
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="field">
+        <label for="claim-phone">Phone</label>
+        <input
+          type="tel"
+          id="claim-phone"
+          name="contact[phone]"
+          placeholder="10 digits, no special characters or spaces. eg. '9379389001'"
+          value="{{ form.phone }}"
+        >
+        {% if form.errors.phone %}
+          <div class="error">{{ form.errors.phone }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Order Number -->
+      <div class="field">
+        <label for="claim-order-number" class="required">Order Number</label>
+        <input
+          type="text"
+          id="claim-order-number"
+          name="contact[order_number]"
+          placeholder="eg. 919123123 (PondandGardenDepot.com), 123-1234567-1234567 (Amazon), 12-12345-12345 (eBay)"
+          required
+        >
+      </div>
+
+      <div class="flex-container">
+        <!-- Alternate Phone Number -->
+        <div class="field w-full">
+          <label for="claim-alt-phone">Alternate Phone Number (Optional)</label>
+          <input
+            type="text"
+            id="claim-alt-phone"
+            name="contact[alt_phone]"
+            placeholder="10 digits, no spaces (e.g. 9379389001)"
+          >
+        </div>
+
+        <!-- Product Manufacturer -->
+        <div class="field w-full">
+          <label for="claim-manufacturer">Product Manufacturer</label>
+          <input
+            type="text"
+            id="claim-manufacturer"
+            name="contact[manufacturer]"
+            placeholder="eg. Pondmaster, EasyPro, Custom Pro, etc."
+          >
+        </div>
+      </div>
+
+      <!-- Product Serial Number -->
+      <div class="field">
+        <label for="claim-serial-number">Product Serial Number (If Applicable)</label>
+        <input
+          type="text"
+          id="claim-serial-number"
+          name="contact[serial_number]"
+          placeholder="Note:If the product is serialized and left blank, we will be unable to process"
+        >
+      </div>
+
+      <div class="flex-container">
+        <!-- Have you tried the product on a different outlet? -->
+        <div class="field w-full">
+          <label for="claim-outlet-tried">Have you tried the product on a different outlet?</label>
+          <select id="claim-outlet-tried" name="contact[outlet_tried]">
+            <option value="" disabled selected>Choose an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="N/A (Non-electrical)">N/A (Non-electrical product)</option>
+          </select>
+        </div>
+
+        <!-- Have you plugged a different device into the outlet? -->
+        <div class="field w-full">
+          <label for="claim-outlet-device">Have you plugged a different device into the outlet?</label>
+          <select id="claim-outlet-device" name="contact[outlet_device]">
+            <option value="" disabled selected>Choose an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="N/A (Non-electrical)">N/A (Non-electrical product)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Provide a brief description of the product failure -->
+      <div class="field">
+        <label for="claim-failure-desc" class="required">Provide a brief description of the product failure</label>
+        <textarea
+          id="claim-failure-desc"
+          name="contact[failure_description]"
+          rows="4"
+          placeholder="Describe the issue..."
+          required
+        ></textarea>
+      </div>
+
+      <!-- Media Upload -->
+
+      <div class="field">
+        <label for="warranty-claim-media"
+          ><strong>Please upload photos of the issue and the defective product.</strong></label
+        >
+        <p>
+          If there is a serial number on the product, kindly include a photo of it as well. To help us better understand
+          the problem, please provide at least two clear photos of the defective product.
+        </p>
+        <input
+          type="file"
+          id="warranty-claim-media"
+          name="contact[media]"
+          accept="image/*"
+        >
+        {% if form.errors.media %}
+          <div class="error">{{ form.errors.media }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Next Button -->
+      <div class="">
+        <button type="button" class="btn btn--primary w-full">Next</button>
+      </div>
+    </div>
+    <!-- END STEP 1 -->
+
+    <!-- STEP 2: PUMPS ONLY -->
+    <div class="form-step" style="display: none;">
+      <h3>Fill out this section for Pumps Only</h3>
+      <p>
+        <strong> If this doesn't apply, scroll to the bottom and click "Next." </strong> This information is used to
+        make sure your pump is correct for your application. If an incorrect pump is being used, this information will
+        help us determine which pump would be best for your application.
+      </p>
+
+      <div class="field">
+        <label class="field-title">Pump Application</label>
+        <div class="radio-group">
+          <label>
+            <input
+              type="radio"
+              name="contact[pump_application]"
+              value="Pond With Skimmer"
+            >
+            Pond With Skimmer
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              name="contact[pump_application]"
+              value="Pond Without Skimmer"
+            >
+            Pond Without Skimmer
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              name="contact[pump_application]"
+              value="Pondless"
+            >
+            Pondless
+          </label>
+
+          <label class="other-radio-wrapper w-full">
+            <!-- Radio is visible, but you could hide it if desired -->
+            <input
+              type="radio"
+              name="contact[pump_application]"
+              value="Other"
+              class="other-radio-input"
+            >
+            <input
+              type="text"
+              name="contact[pump_application_other]"
+              placeholder="Other"
+              class="other-radio-text "
+            >
+          </label>
+        </div>
+      </div>
+
+      <!-- If using a skimmer, which model? -->
+      <div class="field">
+        <label for="claim-skimmer-model">If using a skimmer, which model?</label>
+        <input
+          type="text"
+          id="claim-skimmer-model"
+          name="contact[skimmer_model]"
+          placeholder="Enter skimmer model"
+        >
+      </div>
+
+      <!-- "Select all that apply" heading -->
+      <h4 class="field-title">Select all that apply</h4>
+
+      <!-- 2-column checkbox grid -->
+      <div class="checkbox-group">
+        <!-- Pump hums or rattles, no water movement -->
+        <label for="pump-hums">
+          <input
+            type="checkbox"
+            id="pump-hums"
+            name="contact[pump_hums]"
+            value="Yes"
+          >
+          Pump hums or rattles, no water movement
+        </label>
+
+        <!-- Pump cycles off & on -->
+        <label for="pump-cycles">
+          <input
+            type="checkbox"
+            id="pump-cycles"
+            name="contact[pump_cycles]"
+            value="Yes"
+          >
+          Pump cycles off & on
+        </label>
+
+        <!-- Pump trips GFCI / Breaker -->
+        <label for="pump-trips">
+          <input
+            type="checkbox"
+            id="pump-trips"
+            name="contact[pump_trips]"
+            value="Yes"
+          >
+          Pump trips GFCI / Breaker
+        </label>
+
+        <!-- Impeller is clear of debris and still no movement -->
+        <label for="impeller-clear">
+          <input
+            type="checkbox"
+            id="impeller-clear"
+            name="contact[impeller_clear]"
+            value="Yes"
+          >
+          Impeller is clear of debris and still no movement
+        </label>
+
+        <!-- The pump works but produces loud, irregular noise -->
+        <label for="pump-loud-noise">
+          <input
+            type="checkbox"
+            id="pump-loud-noise"
+            name="contact[pump_loud_noise]"
+            value="Yes"
+          >
+          The pump works but produces loud, irregular noise
+        </label>
+
+        <!-- Pump doesn't turn on at all -->
+        <label for="pump-not-turn-on">
+          <input
+            type="checkbox"
+            id="pump-not-turn-on"
+            name="contact[pump_not_turn_on]"
+            value="Yes"
+          >
+          Pump doesn't turn on at all
+        </label>
+      </div>
+
+      <!-- Is there a ball valve in line? -->
+      <div class="field">
+        <label for="claim-ball-valve">
+          Is there a ball valve in line? -
+          <i>Or, any sort of valve that controls the flow of water from the pump.</i>
+        </label>
+        <select id="claim-ball-valve" name="contact[ball_valve]">
+          <option value="" disabled selected>Choose an option</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+
+      <!-- Has the pump cord been cut? -->
+      <div class="field">
+        <label for="claim-pump-cord">
+          Has the pump cord been cut for hardwiring purposes? -
+          <i> Or, has the cord gotten nicked or damaged?</i>
+        </label>
+        <select id="claim-pump-cord" name="contact[pump_cord_cut]">
+          <option value="" disabled selected>Choose an option</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+
+      <div class="flex-container">
+        <!-- Is the designated outlet grounded? -->
+        <div class="field w-full">
+          <label for="claim-outlet-grounded"> Is the designated outlet grounded and functional? </label>
+          <select id="claim-outlet-grounded" name="contact[outlet_grounded]">
+            <option value="" disabled selected>Choose an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        <!-- Is the pump installed below the water line? -->
+        <div class="field w-full">
+          <label for="claim-pump-installation"> Is the pump installed below the pond’s water line? </label>
+          <select id="claim-pump-installation" name="contact[pump_installation]">
+            <option value="" disabled selected>Choose an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Inline">No, it is plumbed in-line</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Has the pump been run dry or exposed to air? -->
+      <div class="field">
+        <label for="claim-run-dry">Has the pump been run dry or exposed to air (not fully submerged)?</label>
+        <select id="claim-run-dry" name="contact[pump_run_dry]">
+          <option value="" disabled selected>Choose an option</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Inline">Has not been run dry, but is plumbed in-line</option>
+        </select>
+      </div>
+
+      <!-- Has pump intake screen been cleaned? -->
+      <div class="field">
+        <label for="claim-intake-clean">Has pump intake screen been cleaned & checked for debris/clogging?</label>
+        <select id="claim-intake-clean" name="contact[pump_intake_clean]">
+          <option value="" disabled selected>Choose an option</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+
+      <div class="flex-container">
+        <!-- Does Pond have functional auto water filler? -->
+        <div class="field w-full">
+          <label for="claim-auto-filler">Does Pond have functional auto water filler?</label>
+          <select id="claim-auto-filler" name="contact[pond_auto_filler]">
+            <option value="" disabled selected>Choose an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        <!-- Have you tried replacing the impeller? -->
+        <div class="field w-full">
+          <label for="claim-impeller-replaced">Have you tried replacing the impeller?</label>
+          <select id="claim-impeller-replaced" name="contact[impeller_replaced]">
+            <option value="" disabled selected>Choose an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Have you checked inside the impeller for debris? -->
+      <div class="field">
+        <label for="claim-impeller-checked"
+          >Have you checked inside the impeller for algae / leaves / other debris?</label
+        >
+        <select id="claim-impeller-checked" name="contact[impeller_checked]">
+          <option value="" disabled selected>Choose an option</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+
+      <!-- Describe the application in which the pump is being run -->
+      <div class="field">
+        <label for="claim-pump-application-desc">Please describe the application in which the pump is being run</label>
+        <textarea
+          id="claim-pump-application-desc"
+          name="contact[pump_application_description]"
+          rows="4"
+          placeholder="Describe your pond or system..."
+        ></textarea>
+      </div>
+
+      <div class="flex justify-between gap-x-6">
+        <!-- Pond/Basin Length -->
+        <div class="field w-full">
+          <label for="claim-pond-length">Pond/Basin Length</label>
+          <input
+            type="text"
+            id="claim-pond-length"
+            name="contact[pond_length]"
+            placeholder="e.g. 10 ft"
+          >
+        </div>
+
+        <!-- Pond/Basin Width -->
+        <div class="field w-full">
+          <label for="claim-pond-width">Pond/Basin Width</label>
+          <input
+            type="text"
+            id="claim-pond-width"
+            name="contact[pond_width]"
+            placeholder="e.g. 8 ft"
+          >
+        </div>
+      </div>
+
+      <!-- Pipe/Hose Size -->
+      <div class="field">
+        <label for="claim-pipe-hose">Pipe/Hose Size</label>
+        <input
+          type="text"
+          id="claim-pipe-hose"
+          name="contact[pipe_hose_size]"
+          placeholder='`eg. 1.5" Kink Free, 1" Vinyl, 2" Schedule 40 PVC`'
+        >
+      </div>
+
+      <div class="flex justify-between gap-x-6">
+        <!-- Average Pond/Basin Depth -->
+        <div class="field w-full">
+          <label for="claim-pond-depth">Average Pond/Basin Depth</label>
+          <input
+            type="text"
+            id="claim-pond-depth"
+            name="contact[pond_depth]"
+            placeholder="e.g. 2 ft"
+          >
+        </div>
+
+        <!-- Streambed Length -->
+        <div class="field w-full">
+          <label for="claim-streambed-length">Streambed Length (if applicable)</label>
+          <input
+            type="text"
+            id="claim-streambed-length"
+            name="contact[streambed_length]"
+            placeholder="e.g. 6 ft"
+          >
+        </div>
+      </div>
+
+      <!-- Pipe/Hose Length -->
+      <div class="field">
+        <label for="claim-pipe-length">Pipe/Hose Length</label>
+        <input
+          type="text"
+          id="claim-pipe-length"
+          name="contact[pipe_length]"
+          placeholder="e.g. 25 ft"
+        >
+      </div>
+
+      <div class="flex-container">
+        <!-- Streambed/Waterfall Width -->
+        <div class="field w-full">
+          <label for="claim-waterfall-width">Streambed/Waterfall Width</label>
+          <input
+            type="text"
+            id="claim-waterfall-width"
+            name="contact[waterfall_width]"
+            placeholder="eg. 36' Waterfall, 12' Stream"
+          >
+        </div>
+
+        <!-- Waterfall Elevation -->
+        <div class="field w-full">
+          <label for="claim-waterfall-elevation">Waterfall Elevation</label>
+          <input
+            type="text"
+            id="claim-waterfall-elevation"
+            name="contact[waterfall_elevation]"
+            placeholder="Height above water level"
+          >
+        </div>
+      </div>
+
+      <div class="flex gap-x-6">
+        <button type="button" class="btn btn--secondary w-full">Previous</button>
+        <button type="button" class="btn btn--primary w-full">Next</button>
+      </div>
+    </div>
+    <!-- END STEP 2 -->
+
+    <!-- STEP 3: AERATORS ONLY -->
+    <div class="form-step" style="display: none;">
+      <h3>Fill out this section for Aerators Only</h3>
+      <p>
+        <strong>If this doesn't apply, scroll to the bottom and click "Next."</strong>
+        This information is used to make sure your air compressor is correct for your application. If an incorrect
+        compressor is being used, this information will help us determine which compressor would be best for your
+        application.
+      </p>
+
+      <h4 class="field-title">Select all that apply</h4>
+      <!-- 2-column checkbox grid -->
+      <div class="checkbox-group">
+        <!-- Compressor makes noise but doesn't move air -->
+
+        <label for="aerator-no-move-air">
+          <input type="checkbox" id="aerator-no-move-air" name="contact[aerator_no_move_air]" value="Yes">
+          Compressor makes noise but doesn't move air
+        </label>
+
+        <!-- Compressor makes noise but fan is not turning -->
+
+        <label for="aerator-fan-not-turning">
+          <input type="checkbox" id="aerator-fan-not-turning" name="contact[aerator_fan_not_turning]" value="Yes">
+          Compressor makes noise but fan is not turning
+        </label>
+
+        <!-- Compressor cycles off & on -->
+
+        <label for="aerator-cycles">
+          <input type="checkbox" id="aerator-cycles" name="contact[aerator_cycles]" value="Yes">
+          Compressor cycles off & on
+        </label>
+
+        <!-- Compressor doesn't turn on at all -->
+
+        <label for="aerator-not-turn-on">
+          <input type="checkbox" id="aerator-not-turn-on" name="contact[aerator_not_turn_on]" value="Yes">
+          Compressor doesn't turn on at all
+        </label>
+      </div>
+
+      <div class="">
+        <!-- Is the designated outlet grounded and functional? -->
+        <div class="field w-full">
+          <label for="aerator-outlet-grounded" class="">Is the designated outlet grounded and functional?</label>
+          <select id="aerator-outlet-grounded" name="contact[aerator_outlet_grounded]">
+            <option value="" disabled selected>Choose an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        <!-- Has the air filter been cleaned and checked for blockage? -->
+        <div class="field w-full">
+          <label for="aerator-filter-cleaned">Has the air filter been cleaned and checked for blockage?</label>
+          <select id="aerator-filter-cleaned" name="contact[aerator_filter_cleaned]">
+            <option value="" disabled selected>Choose an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Has the pump cord been cut for hardwiring purposes? -->
+      <div class="field">
+        <label for="aerator-cord-cut"
+          >Has the pump cord been cut for hardwiring purposes? - Or, has the cord gotten nicked or damaged?</label
+        >
+        <select id="aerator-cord-cut" name="contact[aerator_cord_cut]">
+          <option value="" disabled selected>Choose an option</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+      <div class="flex-container">
+        <!-- Number of diffusers used -->
+        <div class="field w-full">
+          <label for="Number-of-diffusers-used">Number of diffusers used</label>
+          <input
+            type="text"
+            id="Number-of-diffusers-used"
+            name="contact[diffusers-used]"
+            placeholder=""
+          >
+        </div>
+
+        <!-- Size of airline used -->
+        <div class="field w-full">
+          <label for="Size-of-airline-used">Size of airline used </label>
+          <input
+            type="text"
+            id="Size-of-airline-used"
+            name="contact[Size-of-airline-used]"
+            placeholder="eg. 3/8 'ID Poly, 1/2' ID Weighted"
+          >
+        </div>
+      </div>
+      <!-- Have the diffusers been cleaned and checked for blockage or damage? -->
+      <div class="field">
+        <label for="diffusers-been-cleaned">Have the diffusers been cleaned and checked for blockage or damage?</label>
+        <select id="diffusers-been-cleaned" name="contact[aerator_cord_cut]">
+          <option value="" disabled selected>Choose an option</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+      <div class="flex-container">
+        <!-- Type of diffuser(s) -->
+        <div class="field w-full">
+          <label for="Type-of-diffuser">Type of diffuser(s)</label>
+          <input
+            type="text"
+            id="Type-of-diffuser"
+            name="contact[Type-of-diffuser]"
+            placeholder='eg. "10" Membrane Disc Diffuser", "Easypro RAD650W", etc.'
+          >
+        </div>
+        <!-- Where is the compressor located? -->
+        <div class="field w-full">
+          <label for="Where-is-the-compressor-located">Where is the compressor located?</label>
+          <input
+            type="text"
+            id="Where-is-the-compressor-located"
+            name="contact[Where-is-the-compressor-located]"
+            placeholder="Inside, outside, in a shed or pump house, under a decorative cover, next to the pond, etc. "
+          >
+        </div>
+      </div>
+      <!-- Has the compressor been tested with the airline disconnected? -->
+      <div class="field">
+        <label for="aerator-line-disconnected">Has the compressor been tested with the airline disconnected?</label>
+        <select id="aerator-line-disconnected" name="contact[aerator_test_line_disconnected]">
+          <option value="" disabled selected>Choose an option</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>
+      <div class="flex-container">
+        <!-- Length of airline used -->
+        <div class="field w-full">
+          <label for="Length-of-airline-used">Length of airline used</label>
+          <input
+            type="text"
+            id="Length-of-airline-used"
+            name="contact[Length-of-airline-used]"
+            placeholder="Inside, outside, in a shed, pump house, under a cover, or beside the pond."
+          >
+        </div>
+        <!-- Depth of diffuser(s) -->
+        <div class="field w-full">
+          <label for="Depth-of-diffuser">Depth of diffuser(s)</label>
+          <input
+            type="text"
+            id="Depth-of-diffuser"
+            name="contact[Depth-of-diffuser]"
+            placeholder="Not the pond's depth, but the depth of diffuser placement."
+          >
+        </div>
+      </div>
+      <!-- Have you tried replacing the diaphragm(s) or using a rebuild kit? -->
+      <div class="field">
+        <label for="aerator-rebuild-kit">Have you tried replacing the diaphragm(s) or using a rebuild kit?</label>
+        <select id="aerator-rebuild-kit" name="contact[aerator_rebuild_kit]">
+          <option value="" disabled selected>Choose an option</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Both">Both</option>
+        </select>
+      </div>
+
+      <div class="flex gap-x-6">
+        <button type="button" class="btn btn--secondary w-full">Previous</button>
+        <button type="submit " class="btn btn--primary w-full">Next</button>
+      </div>
+    </div>
+
+    <!-- END STEP 3 -->
+    <!-- STEP 4: How should we follow up with you? -->
+    <div class="form-step">
+      <h2>How should we follow up with you?</h2>
+      <p>
+        <strong>Please allow us 3-5 business days to follow up with you.</strong>
+        We are taking the information you've provided, creating a claim with the manufacturer, and then we will update
+        you when the manufacturer has made a decision on your claim. Please do not dispose of the item until you receive
+        word from us, from time to time manufacturers do require that the defective item be returned to them for
+        inspection.
+      </p>
+
+      <!-- Email -->
+
+      <div class="field">
+        <label for="claim-email" class="required">What Email should we use to contact you ?</label>
+        <input
+          type="email"
+          id="claim-email"
+          name="contact[email]"
+          placeholder="Enter your email"
+          value="{{ form.email }}"
+          required
+        >
+      </div>
+
+      <div>
+        <label
+          class="required"
+          for="certify-all-info-correct"
+          style="display:flex; align-items:center; cursor:pointer; margin-top:2rem; margin-bottom:2rem;"
+        >
+          <input
+            type="checkbox"
+            id="certify-all-info-correct"
+            name="contact[certify-all-info-correct"
+            value="Yes"
+            required
+            class="mr-2"
+          >
+          I certify to the best of my knowledge that all information I have provided within this form is true and
+          accurate
+        </label>
+      </div>
+
+      <!-- Your electronic signature -->
+      <div class="field">
+        <label for="electronic-signature" class="required"><strong>Your electronic signature</strong></label>
+        <p>
+          Each party agrees that this Agreement and any other documents to be delivered in connection herewith may be
+          electronically signed, and that any electronic signatures appearing on this Agreement or such other documents
+          are the same as handwritten signatures for the purposes of validity, enforceability, and admissibility. Your
+          submission of this form constitutes an explicit agreement of these terms.
+        </p>
+        <input
+          type="text"
+          id="electronic-signature"
+          name="contact[electronic-signature]"
+          placeholder=""
+        >
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex gap-x-6">
+        <button type="button" class="btn btn--secondary w-full">Previous</button>
+        <button type="submit " class="btn btn--primary w-full">Submit</button>
+      </div>
+    </div>
+
+    <!-- END STEP 4 -->
+  </div>
+  <!-- /#multi-step-form -->
+{% endform %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const otherRadio = document.querySelector('input.other-radio-input');
+    const otherTextField = document.querySelector('input.other-radio-text');
+
+    if (otherRadio && otherTextField) {
+      // When the user clicks or focuses the text field, check the radio button
+      otherTextField.addEventListener('focus', function () {
+        otherRadio.checked = true;
+      });
+      otherTextField.addEventListener('click', function () {
+        otherRadio.checked = true;
+      });
+    }
+  });
+</script>
+
+<!-- Multi-step form JavaScript -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var steps = document.querySelectorAll('#multi-step-form .form-step');
+    var currentStep = 0; // Start at the first step (0)
+
+    function showStep(index) {
+      steps.forEach(function (step, i) {
+        step.style.display = i === index ? 'block' : 'none';
+      });
+    }
+
+    function validateStep(stepElement) {
+      // Basic required field validation
+      var requiredFields = stepElement.querySelectorAll('[required]');
+      var valid = true;
+
+      // Clear old errors
+      stepElement.querySelectorAll('.field-error').forEach(function (el) {
+        el.remove();
+      });
+
+      requiredFields.forEach(function (field) {
+        // If it's a radio or checkbox group, handle differently
+        if (field.type === 'radio') {
+          const name = field.name;
+          const groupChecked = Array.from(stepElement.querySelectorAll('input[name="' + name + '"]')).some(function (
+            radio
+          ) {
+            return radio.checked;
+          });
+          if (!groupChecked) {
+            valid = false;
+            addError(field, 'This field is required.');
+          }
+        } else if (field.type === 'checkbox') {
+          if (!field.checked) {
+            valid = false;
+            addError(field, 'This field is required.');
+          }
+        } else {
+          if (field.value.trim() === '') {
+            valid = false;
+            addError(field, 'This field is required.');
+          }
+        }
+      });
+
+      return valid;
+    }
+
+    function addError(field, message) {
+      var errorMsg = document.createElement('div');
+      errorMsg.className = 'field-error error';
+      errorMsg.textContent = message;
+      field.closest('.field').appendChild(errorMsg);
+    }
+
+    // Attach event listeners to all required fields
+    document.querySelectorAll('#multi-step-form [required]').forEach(function (field) {
+      if (field.type === 'radio' || field.type === 'checkbox') {
+        field.addEventListener('change', function () {
+          var errorEl = field.closest('.field').querySelector('.field-error');
+          if (errorEl) {
+            errorEl.remove();
+          }
+        });
+      } else {
+        field.addEventListener('input', function () {
+          var errorEl = field.closest('.field').querySelector('.field-error');
+          if (errorEl) {
+            errorEl.remove();
+          }
+        });
+      }
+    });
+
+    // Show the first step
+    showStep(currentStep);
+
+    // Next buttons
+    document.querySelectorAll('.btn.btn--primary.w-full').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var currentStepElement = steps[currentStep];
+        if (!validateStep(currentStepElement)) {
+          return; // Do not advance if invalid
+        }
+        if (currentStep < steps.length - 1) {
+          currentStep++;
+          showStep(currentStep);
+        }
+      });
+    });
+
+    // Previous buttons
+    document.querySelectorAll('.btn.btn--secondary').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (currentStep > 0) {
+          currentStep--;
+          showStep(currentStep);
+        }
+      });
+    });
+  });
+</script>
