@@ -1,0 +1,50 @@
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { FlatCompat } from "@eslint/eslintrc";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
+const eslintConfig = [
+  // Define ignored files or directories
+  {
+    ignores: ["node_modules/", ".next/", "public/"],
+  },
+
+  // Use Next.js recommended configuration
+  ...compat.extends("next/core-web-vitals"),
+
+  // Add custom rules and settings
+  {
+    files: ["**/*.js", "**/*.jsx"],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: "module",
+    },
+    rules: {
+      "no-unused-vars": "error",
+      "no-unused-expressions": "error",
+      "prefer-const": "error",
+      "no-undef": "error",
+      "import/no-unresolved": "error", // This rule checks for unresolved modules
+    },
+    settings: {
+      "import/resolver": {
+        node: {
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
+        // If you are using path aliases (like '@'), configure the alias resolver here.
+        alias: {
+          map: [["@", "./src"]],
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
+      },
+    },
+  },
+];
+
+export default eslintConfig;
