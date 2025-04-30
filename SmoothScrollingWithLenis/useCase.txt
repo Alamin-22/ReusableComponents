@@ -1,0 +1,1 @@
+After creating that provider, you just need to wrap your main layout with this provider and you're all set. Now enjoy smooth scrolling.
